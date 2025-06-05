@@ -95,7 +95,7 @@ if st.button("📐 שרטט וחשב"):
         c.setFont('David', 18)
         c.drawCentredString(300, 810, "ברוכים הבאים ל־Welcome Design")
         c.setFont('David', 14)
-        c.drawCentredString(300, 790, "דו"ח תכנון קרניזים בהתאמה אישית")
+        c.drawCentredString(300, 790, 'דו"ח תכנון קרניזים בהתאמה אישית')
         c.setFont('David', 12)
 
         y = 750
