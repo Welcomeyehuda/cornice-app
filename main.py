@@ -104,7 +104,7 @@ if st.button("📐 שרטט וחשב"):
 
         for idx, (fw, fh) in enumerate(frames):
             perim = 2 * (fw + fh)
-            c.drawRightString(550, y, f"מסגרת {idx+1}: רוחב {fw} ס"מ, גובה {fh} ס"מ, היקף כולל {perim} ס"מ")
+            c.drawRightString(550, y, f'מסגרת {idx+1}: רוחב {fw} ס"מ, גובה {fh} ס"מ, היקף כולל {perim} ס"מ')
             y -= 18
 
         y -= 10
