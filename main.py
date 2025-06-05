@@ -52,7 +52,6 @@ def generate_pdf(summary_text, fig):
         c.drawRightString(550, y, line)
         y -= 20
 
-    # הוספת תמונת השרטוט
     img_buffer = BytesIO()
     fig.savefig(img_buffer, format='png', bbox_inches='tight')
     img_buffer.seek(0)
@@ -145,11 +144,16 @@ if st.button("📐 שרטט וחשב"):
     units = math.ceil(total_perimeter / bar_length)
     total_price = units * price
 
-    summary_lines = [f"✨ דגם קרניז שנבחר: {kind}", f"🧱 מידות קיר: {wall_width}×{wall_height} ס\"מ", "\nסיכום כמויות:"]
+    summary_lines = [
+        f"📐 תכנון קרניזים מותאם אישית מבית Welcome Design:",
+        f"✨ דגם שנבחר: {kind}",
+        f"🧱 קיר: {wall_width}×{wall_height} ס\"מ",
+        "\n🔹 מסגרות:"]
     for level, idx, fw, fh, perim in frame_details:
-        summary_lines.append(f"🔹 מסגרת {idx} ({level}): היקף {perim} ס\"מ | רוחב {fw} ס\"מ | גובה {fh} ס\"מ")
-    summary_lines.append(f"\n🧮 סה\"כ היקף: {int(total_perimeter)} ס\"מ | {units} יחידות (מוטות באורך {bar_length} ס\"מ)")
-    summary_lines.append(f"💰 סה\"כ מחיר: {total_price} ש\"ח")
+        summary_lines.append(f"{idx}. {level} – רוחב: {fw} ס\"מ | גובה: {fh} ס\"מ | היקף: {int(perim)} ס\"מ")
+    summary_lines.append(f"\n🧮 סה\"כ היקף: {int(total_perimeter)} ס\"מ")
+    summary_lines.append(f"🪵 נדרש: {units} יחידות (מוטות באורך {bar_length} ס\"מ)")
+    summary_lines.append(f"\n💰 מחיר כולל: {total_price} ₪\n\n📎 מצורף שרטוט")
 
     summary_text = "\n".join(summary_lines)
     st.text_area("📋 פירוט הדו\"ח:", summary_text, height=250)
