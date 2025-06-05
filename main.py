@@ -30,6 +30,7 @@ st.caption("חישוב כמויות אוטומטי מבית Welcome Design")
 mode = st.radio("בחר מצב תכנון:", ["AI פריסטייל", "תכנון ידני"], index=1)
 kind = st.radio("בחר סוג קרניז:", ["2 ס״מ - 69₪", "4 ס״מ - 100₪"], index=0)
 price = 69 if "2 ס״מ" in kind else 100
+bar_length = 290  # כל מוט קרניז הוא 2.9 מטר
 
 wall_width = st.number_input("רוחב הקיר (בס״מ)", min_value=50, value=300, step=10)
 wall_height = st.number_input("גובה הקיר (בס״מ)", min_value=50, value=260, step=10)
@@ -109,7 +110,7 @@ if st.button("📐 שרטט וחשב"):
             ax.add_patch(plt.Rectangle((current_x, y), fw, fh, edgecolor='purple', facecolor='none', linewidth=2))
             ax.annotate(f"ס״מ {fw}", xy=(current_x + fw / 2, y + fh + 5), ha='center', fontsize=8, color='purple')
             ax.annotate(f"ס״מ {fh}", xy=(current_x - 10, y + fh / 2), rotation=90, va='center', fontsize=8, color='purple')
-            ax.annotate(f"רווח 15 ס""מ", xy=(current_x + fw / 2, y - inter_row_gap / 2), ha='center', fontsize=8, color='gray')
+            ax.annotate(f"רווח 15 ס\"מ", xy=(current_x + fw / 2, y - inter_row_gap / 2), ha='center', fontsize=8, color='gray')
             perimeter = 2 * (fw + fh)
             total_perimeter += perimeter
             frame_details.append(("תחתון", i + 1, fw, fh, perimeter))
@@ -121,7 +122,7 @@ if st.button("📐 שרטט וחשב"):
     summary_lines = ["סיכום כמויות:"]
     for level, idx, fw, fh, perim in frame_details:
         summary_lines.append(f"🔹 מסגרת {idx} ({level}): היקף {perim} ס\"מ | רוחב {fw} ס\"מ | גובה {fh} ס\"מ")
-    summary_lines.append(f"\n🧮 סה\"כ היקף: {int(total_perimeter)} ס\"מ | {int(total_perimeter / 100)} יחידות")
+    summary_lines.append(f"\n🧮 סה\"כ היקף: {int(total_perimeter)} ס\"מ | {math.ceil(total_perimeter / bar_length)} יחידות")
     summary_text = "\n".join(summary_lines)
 
     st.text_area("📋 פירוט הדו\"ח:", summary_text, height=200)
@@ -135,6 +136,6 @@ if st.button("📐 שרטט וחשב"):
     with col1:
         st.download_button("📄 הורד PDF (בשלב הבא)", data=summary_text, file_name="cornice_summary.txt")
     with col2:
-        msg = summary_text + f"\n💰 סה\"כ מחיר: {int(total_perimeter/100)*price} ש\"ח"
+        msg = summary_text + f"\n💰 סה\"כ מחיר: {math.ceil(total_perimeter/bar_length)*price} ש\"ח"
         link = f"https://wa.me/?text={urllib.parse.quote(msg)}"
         st.markdown(f"[📤 שתף בוואטסאפ]({link})")
