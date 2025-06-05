@@ -83,7 +83,7 @@ if st.button("📐 שרטט וחשב"):
     st.subheader("📋 סיכום כמויות:")
     for idx, (fw, fh) in enumerate(frames):
         perim = 2 * (fw + fh)
-        st.write(f"🔹 מסגרת {idx+1}: היקף ס״מ {perim}")
+        st.write(f"🔹 מסגרת {idx+1}: היקף {perim} ס״מ")
     st.write(f"📏 סך הכול היקף: {total_perimeter} ס״מ")
 
     section_length_cm = 290
