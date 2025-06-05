@@ -13,8 +13,10 @@ from bidi.algorithm import get_display
 # רישום הגופן העברי ל־PDF
 pdfmetrics.registerFont(TTFont('David', 'DavidLibre-Medium.ttf'))
 
-st.set_page_config(page_title="תכנון קרניזים", layout="centered")
-st.title("📏 תכנון קרניזים חכם + סיכום PDF")
+st.set_page_config(page_title="דו"ח חיתוך קרניזים אישי - Welcome Design", layout="centered")
+st.image("לוגו חדש.png", width=300)
+st.title("✂️ דו"ח חיתוך קרניזים אישי")
+st.caption("מיועד ללקוח כחלק מתהליך תכנון - Welcome Design")
 
 # קלט מידות קיר
 wall_width = st.number_input("רוחב הקיר (בס״מ)", min_value=50, value=300, step=10)
@@ -51,7 +53,6 @@ if st.button("📐 שרטט וחשב"):
     ax.set_aspect('equal')
     ax.invert_yaxis()
 
-    # קיר
     ax.plot([0, wall_width], [0, 0], color='gray')
     ax.plot([0, wall_width], [wall_height, wall_height], color='gray')
     ax.plot([0, 0], [0, wall_height], color='gray')
@@ -85,7 +86,17 @@ if st.button("📐 שרטט וחשב"):
 
     section_length_cm = 290
     required_sections = math.ceil(total_perimeter / section_length_cm)
-    st.write(f"🪚 נדרש: {required_sections} מקטעי קרניז (כל מקטע באורך 2.90 מ׳)")
+    st.write(f"🪚 נדרש: {required_sections} יחידות קרניז (באורך 2.90 מטר)")
+
+    if required_sections:
+        if st.radio("בחר סוג קרניז:", ["2 ס״מ - 69₪", "4 ס״מ - 100₪"], index=0) == "2 ס״מ - 69₪":
+            price = 69
+        else:
+            price = 100
+        st.write(f"💰 עלות משוערת: ₪{required_sections * price}")
+
+    st.markdown("---")
+    st.caption("*השרטוט לצורכי הדמיה בלבד – יש לוודא מדידות בשטח.*")
 
     def rtl(text):
         reshaped = arabic_reshaper.reshape(text)
@@ -98,10 +109,9 @@ if st.button("📐 שרטט וחשב"):
 
         buffer = BytesIO()
         c = canvas.Canvas(buffer, pagesize=A4)
-        c.setFont('David', 18)
-        c.drawCentredString(300, 810, rtl("ברוכים הבאים ל־Welcome Design"))
+        c.drawImage("לוגו חדש.png", 420, 770, width=130, preserveAspectRatio=True)
         c.setFont('David', 14)
-        c.drawCentredString(300, 790, rtl('דו"ח תכנון קרניזים בהתאמה אישית'))
+        c.drawCentredString(300, 790, rtl('דו"ח חיתוך קרניזים אישי'))
         c.setFont('David', 12)
 
         y = 750
@@ -116,7 +126,7 @@ if st.button("📐 שרטט וחשב"):
         y -= 10
         c.drawRightString(550, y, rtl(f'סך הכול היקף: {total_perimeter} ס"מ'))
         y -= 18
-        c.drawRightString(550, y, rtl(f'סך הכול מקטעי קרניז נדרשים: {required_sections} (באורך 2.90 מטר)'))
+        c.drawRightString(550, y, rtl(f'סך הכול נדרש: {required_sections} יחידות קרניז (2.90 מטר)'))
 
         image = ImageReader(img_buffer)
         c.drawImage(image, 50, 100, width=500, preserveAspectRatio=True)
@@ -128,4 +138,8 @@ if st.button("📐 שרטט וחשב"):
         return buffer
 
     pdf_buffer = create_pdf(fig)
-    st.download_button("📄 הורד PDF עם הסיכום", data=pdf_buffer, file_name="cornice_summary.pdf", mime="application/pdf")
+    st.download_button("📄 הורד PDF", data=pdf_buffer, file_name="cornice_summary.pdf", mime="application/pdf")
+
+    share_text = f"תכנון מותאם אישית לקרניזים של Welcome Design\nהיקף כולל: {total_perimeter} ס\"מ\nנדרשות {required_sections} יחידות."
+    whatsapp_link = f"https://api.whatsapp.com/send?text={share_text}"
+    st.markdown(f"[📤 שתף בוואטסאפ]({whatsapp_link})")
