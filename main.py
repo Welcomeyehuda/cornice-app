@@ -118,18 +118,23 @@ if st.button("📐 שרטט וחשב"):
     st.pyplot(fig)
     st.success(f"סה\"כ היקף קרניז: {total_perimeter} ס\"מ")
 
-    # Save figure to image for WhatsApp or PDF
+    summary_lines = ["סיכום כמויות:"]
+    for level, idx, fw, fh, perim in frame_details:
+        summary_lines.append(f"🔹 מסגרת {idx} ({level}): היקף {perim} ס\"מ | רוחב {fw} ס\"מ | גובה {fh} ס\"מ")
+    summary_lines.append(f"\n🧮 סה\"כ היקף: {int(total_perimeter)} ס\"מ | {int(total_perimeter / 100)} יחידות")
+    summary_text = "\n".join(summary_lines)
+
+    st.text_area("📋 פירוט הדו\"ח:", summary_text, height=200)
+
     img_buf = BytesIO()
     fig.savefig(img_buf, format='png')
     img_buf.seek(0)
     img_base64 = base64.b64encode(img_buf.read()).decode('utf-8')
-    
-    # Display download and WhatsApp options
-    st.markdown("---")
+
     col1, col2 = st.columns(2)
     with col1:
-        st.download_button("📄 הורד PDF (בשלב הבא)", data="PDF עדיין בפיתוח", file_name="cornice_summary.pdf")
+        st.download_button("📄 הורד PDF (בשלב הבא)", data=summary_text, file_name="cornice_summary.txt")
     with col2:
-        msg = f"היי! הנה הסיכום לתכנון הקרניז שלך עם היקף כולל של {int(total_perimeter)} ס\"מ.\nבהתאם למחיר {kind}, הסכום הכולל הוא {int(total_perimeter/100)*price} ש\"ח."
+        msg = summary_text + f"\n💰 סה\"כ מחיר: {int(total_perimeter/100)*price} ש\"ח"
         link = f"https://wa.me/?text={urllib.parse.quote(msg)}"
         st.markdown(f"[📤 שתף בוואטסאפ]({link})")
