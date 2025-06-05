@@ -8,21 +8,21 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
 # רישום הגופן העברי ל־PDF
-pdfmetrics.registerFont(TTFont('David', 'david.ttf'))
+pdfmetrics.registerFont(TTFont('David', 'DavidLibre-Medium.ttf'))
 
 st.set_page_config(page_title="תכנון קרניזים", layout="centered")
-st.title("\ud83d\udccf תכנון קרניזים חכם + סיכום PDF")
+st.title("📏 תכנון קרניזים חכם + סיכום PDF")
 
 # קלט מידות קיר
-wall_width = st.number_input("רוחב הקיר (בס\u05e1\u05b4\u05dd)", min_value=50, value=300, step=10)
-wall_height = st.number_input("גובה הקיר (בס\u05e1\u05b4\u05dd)", min_value=50, value=260, step=10)
+wall_width = st.number_input("רוחב הקיר (בס״מ)", min_value=50, value=300, step=10)
+wall_height = st.number_input("גובה הקיר (בס״מ)", min_value=50, value=260, step=10)
 
 # מספר מסגרות
 frame_count = st.number_input("כמה מסגרות תרצה?", min_value=1, value=3, step=1)
 
 # קלט מסגרות
 frames = []
-st.subheader("מידות כל מסגרת (בס\u05e1\u05b4\u05dd)")
+st.subheader("מידות כל מסגרת (בס״מ)")
 for i in range(int(frame_count)):
     col1, col2 = st.columns(2)
     with col1:
@@ -40,7 +40,7 @@ total_frames_width = sum(f[0] for f in frames)
 spacing = (available_width - total_frames_width) / (len(frames) + 1)
 
 # כפתור פעולה
-if st.button("\ud83d\udcd0 שרטט וחשב"):
+if st.button("📐 שרטט וחשב"):
     # ציור
     fig, ax = plt.subplots(figsize=(10, 6))
     ax.set_xlim(0, wall_width)
@@ -60,29 +60,29 @@ if st.button("\ud83d\udcd0 שרטט וחשב"):
     for i, (fw, fh) in enumerate(frames):
         y = top_margin
         ax.add_patch(plt.Rectangle((current_x, y), fw, fh, edgecolor='blue', facecolor='none', linewidth=2))
-        ax.annotate(f"\u05e1\u05b4\u05dd {fw}", xy=(current_x + fw / 2, y + fh + 5), ha='center', fontsize=8, color='blue')
-        ax.annotate(f"\u05e1\u05b4\u05dd {fh}", xy=(current_x - 10, y + fh / 2), rotation=90, va='center', fontsize=8, color='blue')
+        ax.annotate(f"ס״מ {fw}", xy=(current_x + fw / 2, y + fh + 5), ha='center', fontsize=8, color='blue')
+        ax.annotate(f"ס״מ {fh}", xy=(current_x - 10, y + fh / 2), rotation=90, va='center', fontsize=8, color='blue')
         if i < len(frames) - 1:
-            ax.annotate(f"\u05e1\u05b4\u05dd {int(spacing)}", xy=(current_x + fw + spacing / 2, y + fh / 2), ha='center', fontsize=8, color='green')
+            ax.annotate(f"ס״מ {int(spacing)}", xy=(current_x + fw + spacing / 2, y + fh / 2), ha='center', fontsize=8, color='green')
         total_perimeter += 2 * (fw + fh)
         current_x += fw + spacing
 
-    ax.annotate(f"\u05e1\u05b4\u05dd {top_margin}", xy=(5, top_margin / 2), rotation=90, va='center', fontsize=8, color='red')
-    ax.annotate(f"\u05e1\u05b4\u05dd {side_margin}", xy=(side_margin / 2, wall_height - 5), ha='center', fontsize=8, color='red')
-    ax.annotate(f"\u05e1\u05b4\u05dd {side_margin}", xy=(wall_width - side_margin / 2, wall_height - 5), ha='center', fontsize=8, color='red')
+    ax.annotate(f"ס״מ {top_margin}", xy=(5, top_margin / 2), rotation=90, va='center', fontsize=8, color='red')
+    ax.annotate(f"ס״מ {side_margin}", xy=(side_margin / 2, wall_height - 5), ha='center', fontsize=8, color='red')
+    ax.annotate(f"ס״מ {side_margin}", xy=(wall_width - side_margin / 2, wall_height - 5), ha='center', fontsize=8, color='red')
 
     st.pyplot(fig)
 
     # סיכום טקסטואלי
-    st.subheader("\ud83d\udccb סיכום כמויות:")
+    st.subheader("📋 סיכום כמויות:")
     for idx, (fw, fh) in enumerate(frames):
         perim = 2 * (fw + fh)
-        st.write(f"\ud83d\udd39 מסגרת {idx+1}: היקף ס\u05b4\u05dd {perim}")
-    st.write(f"\ud83e\uddee סך הכול היקף: ס\u05b4\u05dd {total_perimeter}")
+        st.write(f"🔹 מסגרת {idx+1}: היקף ס״מ {perim}")
+    st.write(f"🧮 סך הכול היקף: ס״מ {total_perimeter}")
 
     section_length_cm = 290
     required_sections = math.ceil(total_perimeter / section_length_cm)
-    st.write(f"\ud83e\ude9a נדרש: {required_sections} מקטעי קרניז (כל מקטע באורך 2.90 מ׳)")
+    st.write(f"🪚 נדרש: {required_sections} מקטעי קרניז (כל מקטע באורך 2.90 מ׳)")
 
     def create_pdf():
         buffer = BytesIO()
@@ -112,4 +112,4 @@ if st.button("\ud83d\udcd0 שרטט וחשב"):
         return buffer
 
     pdf_buffer = create_pdf()
-    st.download_button("\ud83d\udcc4 הורד PDF עם הסיכום", data=pdf_buffer, file_name="cornice_summary.pdf", mime="application/pdf")
+    st.download_button("📄 הורד PDF עם הסיכום", data=pdf_buffer, file_name="cornice_summary.pdf", mime="application/pdf")
