@@ -17,11 +17,11 @@ st.set_page_config(page_title='דו"ח חיתוך קרניזים אישי - Welc
 
 # קריאה בטוחה ללוגו כקובץ בינארי
 try:
-    with open("לוגו חדש.png", "rb") as logo_file:
+    with open("logo.png", "rb") as logo_file:
         logo_bytes = logo_file.read()
         st.image(logo_bytes, width=300)
 except Exception as e:
-    st.warning("⚠️ לא ניתן להציג את הלוגו. ודא שהקובץ 'לוגו חדש.png' קיים בתיקייה.")
+    st.warning("⚠️ לא ניתן להציג את הלוגו. ודא שהקובץ 'logo.png' קיים בתיקייה.")
     logo_bytes = None
 
 st.title("✂️ תכנון חיתוך קרניזים אישי ומדויק")
