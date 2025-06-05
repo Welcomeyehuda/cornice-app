@@ -153,7 +153,7 @@ if st.button("📐 שרטט וחשב"):
         summary_lines.append(f"{idx}. {level} – רוחב: {fw} ס\"מ | גובה: {fh} ס\"מ | היקף: {int(perim)} ס\"מ")
     summary_lines.append(f"\n🧮 סה\"כ היקף: {int(total_perimeter)} ס\"מ")
     summary_lines.append(f"🪵 נדרש: {units} יחידות (מוטות באורך {bar_length} ס\"מ)")
-    summary_lines.append(f"\n💰 מחיר כולל: {total_price} ₪\n\n📎 מצורף שרטוט")
+    summary_lines.append(f"\n💰 מחיר כולל: {total_price} ₪")
 
     summary_text = "\n".join(summary_lines)
     st.text_area("📋 פירוט הדו\"ח:", summary_text, height=250)
