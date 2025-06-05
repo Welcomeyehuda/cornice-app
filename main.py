@@ -99,7 +99,7 @@ if st.button("📐 שרטט וחשב"):
         c.setFont('David', 12)
 
         y = 750
-        c.drawRightString(550, y, f"רוחב קיר: {wall_width} ס"מ    גובה קיר: {wall_height} ס"מ")
+        c.drawRightString(550, y, f'רוחב קיר: {wall_width} ס"מ    גובה קיר: {wall_height} ס"מ')
         y -= 20
 
         for idx, (fw, fh) in enumerate(frames):
