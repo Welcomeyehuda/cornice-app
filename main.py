@@ -27,7 +27,9 @@ except Exception as e:
 st.title("✂️ תכנון חיתוך קרניזים אישי ומדויק")
 st.caption("חישוב כמויות אוטומטי מבית Welcome Design")
 
-# סוג הקרניז לפני השרטוט
+# מצב תכנון
+mode = st.radio("בחר מצב תכנון:", ["AI פריסטייל", "תכנון ידני"], index=1)
+
 kind = st.radio("בחר סוג קרניז:", ["2 ס״מ - 69₪", "4 ס״מ - 100₪"], index=0)
 price = 69 if "2 ס״מ" in kind else 100
 
@@ -37,21 +39,31 @@ wall_height = st.number_input("גובה הקיר (בס״מ)", min_value=50, valu
 frame_count = st.number_input("כמה מסגרות תרצה בשורה העליונה?", min_value=1, value=3, step=1)
 
 frames_top = []
-st.subheader("✏️ מידות המסגרות העליונות")
-for i in range(int(frame_count)):
-    col1, col2 = st.columns(2)
-    with col1:
-        fw = st.number_input(f"רוחב מסגרת {i+1}", key=f"top_fw_{i}", min_value=10, value=100)
-    with col2:
-        fh = st.number_input(f"גובה מסגרת {i+1}", key=f"top_fh_{i}", min_value=10, value=140)
-    frames_top.append((fw, fh))
-
-show_bottom = st.checkbox("הוסף מסגרות תחתונות")
 frames_bottom = []
+
 bottom_margin = 10
 vertical_gap = 20
+side_margin = 10
+top_margin = 20
 
-if show_bottom:
+if mode == "תכנון ידני":
+    st.subheader("✏️ מידות המסגרות העליונות")
+    for i in range(int(frame_count)):
+        col1, col2 = st.columns(2)
+        with col1:
+            fw = st.number_input(f"רוחב מסגרת {i+1}", key=f"top_fw_{i}", min_value=10, value=100)
+        with col2:
+            fh = st.number_input(f"גובה מסגרת {i+1}", key=f"top_fh_{i}", min_value=10, value=140)
+        frames_top.append((fw, fh))
+else:
+    default_fw = 80
+    default_fh = 140
+    max_frames = int((wall_width - 2 * side_margin + 10) // (default_fw + 10))
+    frames_top = [(default_fw, default_fh)] * max_frames
+
+show_bottom = st.checkbox("הוסף מסגרות תחתונות")
+
+if mode == "תכנון ידני" and show_bottom:
     st.subheader("✏️ מידות המסגרות התחתונות")
     for i in range(int(frame_count)):
         col1, col2 = st.columns(2)
@@ -60,12 +72,13 @@ if show_bottom:
         with col2:
             fh = st.number_input(f"גובה תחתון מסגרת {i+1}", key=f"bottom_fh_{i}", min_value=10, value=60)
         frames_bottom.append((fw, fh))
+elif mode == "AI פריסטייל" and show_bottom:
+    default_fw = 80
+    default_fh = 60
+    frames_bottom = [(default_fw, default_fh)] * len(frames_top)
 
-side_margin = 10
-top_margin = 20
 available_width = wall_width - 2 * side_margin
 total_frames_width = sum(f[0] for f in frames_top)
-
 spacing = (available_width - total_frames_width) / (len(frames_top) - 1) if len(frames_top) > 1 else 0
 
 if st.button("📐 שרטט וחשב"):
@@ -105,3 +118,13 @@ if st.button("📐 שרטט וחשב"):
 
     st.pyplot(fig)
     st.success(f"היקף כולל: {total_perimeter} ס\"מ")
+
+    buffer = BytesIO()
+    fig.savefig(buffer, format='png')
+    buffer.seek(0)
+
+    text = f"תכנון קרניזים אישי - Welcome Design\nהיקף כולל: {total_perimeter} ס\"מ"
+    whatsapp_url = f"https://wa.me/?text={urllib.parse.quote(text)}"
+    st.markdown(f"[📤 שתף בוואטסאפ]({whatsapp_url})", unsafe_allow_html=True)
+
+    # future: add export to PDF with reportlab here if needed
