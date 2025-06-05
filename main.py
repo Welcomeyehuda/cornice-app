@@ -10,6 +10,7 @@ from reportlab.lib.utils import ImageReader
 import arabic_reshaper
 from bidi.algorithm import get_display
 import urllib.parse
+import base64
 
 pdfmetrics.registerFont(TTFont('David', 'DavidLibre-Medium.ttf'))
 
@@ -117,4 +118,18 @@ if st.button("📐 שרטט וחשב"):
     st.pyplot(fig)
     st.success(f"סה\"כ היקף קרניז: {total_perimeter} ס\"מ")
 
-    # בשלב הבא נוסיף דוח PDF מקצועי + שיתוף וואטסאפ + תצוגת טקסט מלאה
+    # Save figure to image for WhatsApp or PDF
+    img_buf = BytesIO()
+    fig.savefig(img_buf, format='png')
+    img_buf.seek(0)
+    img_base64 = base64.b64encode(img_buf.read()).decode('utf-8')
+    
+    # Display download and WhatsApp options
+    st.markdown("---")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.download_button("📄 הורד PDF (בשלב הבא)", data="PDF עדיין בפיתוח", file_name="cornice_summary.pdf")
+    with col2:
+        msg = f"היי! הנה הסיכום לתכנון הקרניז שלך עם היקף כולל של {int(total_perimeter)} ס\"מ.\nבהתאם למחיר {kind}, הסכום הכולל הוא {int(total_perimeter/100)*price} ש\"ח."
+        link = f"https://wa.me/?text={urllib.parse.quote(msg)}"
+        st.markdown(f"[📤 שתף בוואטסאפ]({link})")
