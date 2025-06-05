@@ -149,4 +149,19 @@ if st.button("📐 שרטט וחשב"):
     share_text = f"תכנון אישי לחיפוי קרניזים מבית Welcome Design! 🎨\n• היקף כולל: {total_perimeter} ס\"מ\n• נדרשים {required_sections} מוטות (2.90 מטר)\n• עלות משוערת: ₪{total_cost}\n📍מחירים מיוחדים והתקנה מקצועית – דברו איתנו!"
     encoded = urllib.parse.quote(share_text)
     whatsapp_link = f"https://api.whatsapp.com/send?text={encoded}"
-    st.markdown(f"[📤 שתף בוואטסאפ]({whatsapp_link})")
+
+    # שליחה דרך וואטסאפ - טקסט + שרטוט
+    png_buffer = BytesIO()
+    fig.savefig(png_buffer, format="PNG")
+    png_buffer.seek(0)
+
+    with st.expander("📤 שיתוף בוואטסאפ"):
+        st.download_button(
+            label="📷 הורד את השרטוט כתמונה (PNG)",
+            data=png_buffer,
+            file_name="cornice_diagram.png",
+            mime="image/png"
+        )
+        st.markdown("שלב 1️⃣: שלח את התמונה 👆 בוואטסאפ\n\nשלב 2️⃣: העתק את הטקסט והדבק 👇")
+        st.code(share_text, language="text")
+        st.markdown(f"[לחץ כאן לשלוח רק את הטקסט בוואטסאפ]({whatsapp_link})")
