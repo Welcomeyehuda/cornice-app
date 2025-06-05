@@ -51,6 +51,8 @@ if mode == "תכנון ידני":
 else:
     default_fw, default_fh = 80, 140
     max_frames = int((wall_width - 2 * side_margin + 10) // (default_fw + 10))
+    available_width = wall_width - 2 * side_margin
+    spacing = (available_width - (default_fw * max_frames)) / (max_frames - 1) if max_frames > 1 else 0
     frames_top = [(default_fw, default_fh)] * max_frames
 
 show_bottom = st.checkbox("הוסף מסגרות תחתונות")
@@ -123,6 +125,9 @@ if st.button("📐 שרטט וחשב"):
     total_price = motim * price
 
     text = f"תכנון קרניזים אישי - Welcome Design\nסה\"כ היקף: {total_perimeter} ס\"מ\nסה\"כ מוטות: {motim}\nסה\"כ מחיר: ₪{total_price}"
+    for pos, num, fw, fh, perim in frame_details:
+        text += f"\nמסגרת {pos} #{num}: {fw}×{fh} ס\"מ | היקף: {perim} ס\"מ"
+
     whatsapp_url = f"https://wa.me/?text={urllib.parse.quote(text)}"
     st.markdown(f"[📤 שתף בוואטסאפ]({whatsapp_url})", unsafe_allow_html=True)
 
