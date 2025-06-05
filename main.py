@@ -108,9 +108,9 @@ if st.button("📐 שרטט וחשב"):
             y -= 18
 
         y -= 10
-        c.drawRightString(550, y, f"סה"כ היקף: {total_perimeter} ס"מ")
+        c.drawRightString(550, y, f'סך הכול היקף: {total_perimeter} ס"מ')
         y -= 18
-        c.drawRightString(550, y, f"סה"כ מקטעי קרניז נדרשים: {required_sections} (באורך 2.90 מטר)")
+        c.drawRightString(550, y, f'סך הכול מקטעי קרניז נדרשים: {required_sections} (באורך 2.90 מטר)')
 
         image = ImageReader(img_buffer)
         c.drawImage(image, 50, 100, width=500, preserveAspectRatio=True)
