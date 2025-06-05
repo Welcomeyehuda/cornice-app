@@ -41,16 +41,24 @@ frames_top, frames_bottom = [], []
 bottom_margin, vertical_gap, side_margin = 10, 20, 10
 top_margin, inter_row_gap = 20, 15
 
-def generate_pdf(summary_text):
+def generate_pdf(summary_text, fig):
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)
     c.setFont("David", 12)
-    reshaped = arabic_reshaper.reshape(summary_text)
-    bidi_text = get_display(reshaped)
+
+    reshaped_lines = [get_display(arabic_reshaper.reshape(line)) for line in summary_text.split("\n")]
     y = 800
-    for line in bidi_text.split("\n"):
-        c.drawRightString(550, y, get_display(arabic_reshaper.reshape(line)))
+    for line in reshaped_lines:
+        c.drawRightString(550, y, line)
         y -= 20
+
+    # הוספת תמונת השרטוט
+    img_buffer = BytesIO()
+    fig.savefig(img_buffer, format='png', bbox_inches='tight')
+    img_buffer.seek(0)
+    img = ImageReader(img_buffer)
+    c.drawImage(img, 100, 100, width=400, preserveAspectRatio=True)
+
     c.showPage()
     c.save()
     buffer.seek(0)
@@ -137,10 +145,10 @@ if st.button("📐 שרטט וחשב"):
     units = math.ceil(total_perimeter / bar_length)
     total_price = units * price
 
-    summary_lines = [f"✨ דגם קרניז שנבחר: {kind}", "\nסיכום כמויות:"]
+    summary_lines = [f"✨ דגם קרניז שנבחר: {kind}", f"🧱 מידות קיר: {wall_width}×{wall_height} ס\"מ", "\nסיכום כמויות:"]
     for level, idx, fw, fh, perim in frame_details:
         summary_lines.append(f"🔹 מסגרת {idx} ({level}): היקף {perim} ס\"מ | רוחב {fw} ס\"מ | גובה {fh} ס\"מ")
-    summary_lines.append(f"\n🧮 סה\"כ היקף: {int(total_perimeter)} ס\"מ | {units} יחידות")
+    summary_lines.append(f"\n🧮 סה\"כ היקף: {int(total_perimeter)} ס\"מ | {units} יחידות (מוטות באורך {bar_length} ס\"מ)")
     summary_lines.append(f"💰 סה\"כ מחיר: {total_price} ש\"ח")
 
     summary_text = "\n".join(summary_lines)
@@ -148,12 +156,13 @@ if st.button("📐 שרטט וחשב"):
 
     col1, col2 = st.columns(2)
     with col1:
-        pdf_buffer = generate_pdf(summary_text)
+        pdf_buffer = generate_pdf(summary_text, fig)
         st.download_button(
             label="📄 הורד PDF",
             data=pdf_buffer,
             file_name="cornice_summary.pdf",
-            mime="application/pdf"
+            mime="application/pdf",
+            type="primary"
         )
     with col2:
         link = f"https://wa.me/?text={urllib.parse.quote(summary_text)}"
