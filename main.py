@@ -144,7 +144,7 @@ if st.button("📐 שרטט וחשב"):
 
     y_position = 740
     for pos, num, fw, fh, perim in frame_details:
-        line = f"מסגרת {pos} #{num}: {fw}×{fh} ס״מ | היקף: {perim} ס״מ"
+        line = f"מסגרת {pos} #{num}: {fw}×{fh} ס\"מ | היקף: {perim} ס\"מ"
         reshaped_line = arabic_reshaper.reshape(line)
         bidi_line = get_display(reshaped_line)
         c.drawRightString(550, y_position, bidi_line)
@@ -154,14 +154,12 @@ if st.button("📐 שרטט וחשב"):
             c.setFont("David", 14)
             y_position = 770
 
-    summary_text = f"סה\"כ קרניזים: {total_perimeter} ס\"מ | נדרש {motim} מוטות ({mot_length} ס\"מ כל אחד)"
-    price_text = f"סה\"כ מחיר: ₪{total_price}"
-
-    for line in [summary_text, price_text]:
-        reshaped = arabic_reshaper.reshape(line)
-        bidi_line = get_display(reshaped)
-        c.drawRightString(550, y_position, bidi_line)
-        y_position -= 20
+    reshaped_summary = arabic_reshaper.reshape(f"סה\"כ קרניזים: {total_perimeter} ס\"מ | נדרש {motim} מוטות ({mot_length} ס\"מ כל אחד)")
+    reshaped_price = arabic_reshaper.reshape(f"סה\"כ מחיר: ₪{total_price}")
+    c.drawRightString(550, y_position, get_display(reshaped_summary))
+    y_position -= 20
+    c.drawRightString(550, y_position, get_display(reshaped_price))
+    y_position -= 40
 
     c.drawImage(ImageReader(buffer), 50, 20, width=500, preserveAspectRatio=True, mask='auto')
     c.showPage()
