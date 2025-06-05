@@ -2,8 +2,15 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import math
 from io import BytesIO
-from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfbase import rl_config
+
+# רישום הגופן העברי ל־PDF
+pdfmetrics.registerFont(TTFont('David', 'david.ttf'))
+rl_config.defaultEncoding = 'UTF-8'
 
 st.set_page_config(page_title="תכנון קרניזים", layout="centered")
 st.title("📏 תכנון קרניזים חכם + סיכום PDF")
@@ -26,7 +33,7 @@ for i in range(int(frame_count)):
         fh = st.number_input(f"גובה מסגרת {i+1}", key=f"fh_{i}", min_value=10, value=140)
     frames.append((fw, fh))
 
-# הגדרות מרווחים
+# מרווחים קבועים
 side_margin = 10
 top_margin = 20
 bottom_margin = 10
@@ -34,8 +41,9 @@ available_width = wall_width - 2 * side_margin
 total_frames_width = sum(f[0] for f in frames)
 spacing = (available_width - total_frames_width) / (len(frames) + 1)
 
-# ציור
+# כפתור פעולה
 if st.button("📐 שרטט וחשב"):
+    # ציור
     fig, ax = plt.subplots(figsize=(10, 6))
     ax.set_xlim(0, wall_width)
     ax.set_ylim(0, wall_height)
@@ -48,7 +56,6 @@ if st.button("📐 שרטט וחשב"):
     ax.plot([0, 0], [0, wall_height], color='gray')
     ax.plot([wall_width, wall_width], [0, wall_height], color='gray')
 
-    # מסגרות
     current_x = side_margin + spacing
     total_perimeter = 0
 
@@ -59,7 +66,6 @@ if st.button("📐 שרטט וחשב"):
         ax.annotate(f"ס״מ {fh}", xy=(current_x - 10, y + fh / 2), rotation=90, va='center', fontsize=8, color='blue')
         if i < len(frames) - 1:
             ax.annotate(f"ס״מ {int(spacing)}", xy=(current_x + fw + spacing / 2, y + fh / 2), ha='center', fontsize=8, color='green')
-
         total_perimeter += 2 * (fw + fh)
         current_x += fw + spacing
 
@@ -69,33 +75,41 @@ if st.button("📐 שרטט וחשב"):
 
     st.pyplot(fig)
 
-    # סיכום נתונים
+    # סיכום טקסטואלי
     st.subheader("📋 סיכום כמויות:")
     for idx, (fw, fh) in enumerate(frames):
         perim = 2 * (fw + fh)
         st.write(f"🔹 מסגרת {idx+1}: היקף ס״מ {perim}")
     st.write(f"🧮 סך הכול היקף: ס״מ {total_perimeter}")
-    
+
     # חישוב מקטעים
     section_length_cm = 290
     required_sections = math.ceil(total_perimeter / section_length_cm)
     st.write(f"🪚 נדרש: {required_sections} מקטעי קרניז (כל מקטע באורך 2.90 מ׳)")
 
-    # PDF
+    # ייצוא PDF
     def create_pdf():
         buffer = BytesIO()
         c = canvas.Canvas(buffer, pagesize=A4)
-        c.setFont("Helvetica", 12)
-        c.drawString(100, 800, "דו״ח תכנון קרניזים")
-        c.drawString(100, 780, f"רוחב קיר: {wall_width} ס״מ   |   גובה קיר: {wall_height} ס״מ")
+        c.setFont('David', 14)
+        x_right = 500
+        y = 800
 
-        y = 750
+        c.drawRightString(x_right, y, "דו\"ח תכנון קרניזים")
+        y -= 25
+        c.drawRightString(x_right, y, f"רוחב קיר: {wall_width} ס\"מ    גובה קיר: {wall_height} ס\"מ")
+        y -= 30
+
         for idx, (fw, fh) in enumerate(frames):
             perim = 2 * (fw + fh)
-            c.drawString(100, y, f"מסגרת {idx+1}: רוחב {fw} ס״מ, גובה {fh} ס״מ, היקף כולל {perim} ס״מ")
-            y -= 20
-        c.drawString(100, y - 10, f"סה״כ היקף: {total_perimeter} ס״מ")
-        c.drawString(100, y - 30, f"סה״כ מקטעי קרניז נדרשים: {required_sections} באורך 2.90 מ׳")
+            c.drawRightString(x_right, y, f"מסגרת {idx+1}: רוחב {fw} ס\"מ, גובה {fh} ס\"מ, היקף כולל {perim} ס\"מ")
+            y -= 22
+
+        y -= 10
+        c.drawRightString(x_right, y, f"סה\"כ היקף: {total_perimeter} ס\"מ")
+        y -= 20
+        c.drawRightString(x_right, y, f"סה\"כ מקטעי קרניז נדרשים: {required_sections} (באורך 2.90 מטר)")
+
         c.showPage()
         c.save()
         buffer.seek(0)
