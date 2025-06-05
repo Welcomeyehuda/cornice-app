@@ -6,6 +6,7 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.lib.utils import ImageReader
 
 # רישום הגופן העברי ל־PDF
 pdfmetrics.registerFont(TTFont('David', 'DavidLibre-Medium.ttf'))
@@ -111,7 +112,8 @@ if st.button("📐 שרטט וחשב"):
         c.drawRightString(x_right, y, f"סה\"כ מקטעי קרניז נדרשים: {required_sections} (באורך 2.90 מטר)")
 
         c.showPage()
-        c.drawImage(img_buffer, 50, 200, width=500, preserveAspectRatio=True, mask='auto')
+        image = ImageReader(img_buffer)
+        c.drawImage(image, 50, 200, width=500, preserveAspectRatio=True)
 
         c.showPage()
         c.save()
