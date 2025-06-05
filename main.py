@@ -92,29 +92,30 @@ if st.button("📐 שרטט וחשב"):
 
         buffer = BytesIO()
         c = canvas.Canvas(buffer, pagesize=A4)
+        c.setFont('David', 18)
+        c.drawCentredString(300, 810, "ברוכים הבאים ל־Welcome Design")
         c.setFont('David', 14)
-        x_right = 500
-        y = 800
+        c.drawCentredString(300, 790, "דו"ח תכנון קרניזים בהתאמה אישית")
+        c.setFont('David', 12)
 
-        c.drawRightString(x_right, y, "דו\"ח תכנון קרניזים")
-        y -= 25
-        c.drawRightString(x_right, y, f"רוחב קיר: {wall_width} ס\"מ    גובה קיר: {wall_height} ס\"מ")
-        y -= 30
+        y = 750
+        c.drawRightString(550, y, f"רוחב קיר: {wall_width} ס"מ    גובה קיר: {wall_height} ס"מ")
+        y -= 20
 
         for idx, (fw, fh) in enumerate(frames):
             perim = 2 * (fw + fh)
-            c.drawRightString(x_right, y, f"מסגרת {idx+1}: רוחב {fw} ס\"מ, גובה {fh} ס\"מ, היקף כולל {perim} ס\"מ")
-            y -= 22
+            c.drawRightString(550, y, f"מסגרת {idx+1}: רוחב {fw} ס"מ, גובה {fh} ס"מ, היקף כולל {perim} ס"מ")
+            y -= 18
 
         y -= 10
-        c.drawRightString(x_right, y, f"סה\"כ היקף: {total_perimeter} ס\"מ")
-        y -= 20
-        c.drawRightString(x_right, y, f"סה\"כ מקטעי קרניז נדרשים: {required_sections} (באורך 2.90 מטר)")
+        c.drawRightString(550, y, f"סה"כ היקף: {total_perimeter} ס"מ")
+        y -= 18
+        c.drawRightString(550, y, f"סה"כ מקטעי קרניז נדרשים: {required_sections} (באורך 2.90 מטר)")
 
-        c.showPage()
         image = ImageReader(img_buffer)
-        c.drawImage(image, 50, 200, width=500, preserveAspectRatio=True)
+        c.drawImage(image, 50, 100, width=500, preserveAspectRatio=True)
 
+        c.rect(30, 30, 530, 780)  # מסגרת עיצובית
         c.showPage()
         c.save()
         buffer.seek(0)
