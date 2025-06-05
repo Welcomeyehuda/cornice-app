@@ -15,7 +15,6 @@ pdfmetrics.registerFont(TTFont('David', 'DavidLibre-Medium.ttf'))
 
 st.set_page_config(page_title='דו"ח חיתוך קרניזים אישי - Welcome Design', layout="centered")
 
-# קריאה בטוחה ללוגו כקובץ בינארי
 try:
     with open("logo.png", "rb") as logo_file:
         logo_bytes = logo_file.read()
@@ -27,25 +26,18 @@ except Exception as e:
 st.title("✂️ תכנון חיתוך קרניזים אישי ומדויק")
 st.caption("חישוב כמויות אוטומטי מבית Welcome Design")
 
-# מצב תכנון
 mode = st.radio("בחר מצב תכנון:", ["AI פריסטייל", "תכנון ידני"], index=1)
-
 kind = st.radio("בחר סוג קרניז:", ["2 ס״מ - 69₪", "4 ס״מ - 100₪"], index=0)
 price = 69 if "2 ס״מ" in kind else 100
 
 wall_width = st.number_input("רוחב הקיר (בס״מ)", min_value=50, value=300, step=10)
 wall_height = st.number_input("גובה הקיר (בס״מ)", min_value=50, value=260, step=10)
-
 frame_count = st.number_input("כמה מסגרות תרצה בשורה העליונה?", min_value=1, value=3, step=1)
 
-frames_top = []
-frames_bottom = []
+frames_top, frames_bottom = [], []
 
-bottom_margin = 10
-vertical_gap = 20
-side_margin = 10
-top_margin = 20
-inter_row_gap = 15  # קבוע בין 10 ל-15 ס״מ
+bottom_margin, vertical_gap, side_margin = 10, 20, 10
+top_margin, inter_row_gap = 20, 15
 
 if mode == "תכנון ידני":
     st.subheader("✏️ מידות המסגרות העליונות")
@@ -57,8 +49,7 @@ if mode == "תכנון ידני":
             fh = st.number_input(f"גובה מסגרת {i+1}", key=f"top_fh_{i}", min_value=10, value=140)
         frames_top.append((fw, fh))
 else:
-    default_fw = 80
-    default_fh = 140
+    default_fw, default_fh = 80, 140
     max_frames = int((wall_width - 2 * side_margin + 10) // (default_fw + 10))
     frames_top = [(default_fw, default_fh)] * max_frames
 
@@ -74,8 +65,7 @@ if mode == "תכנון ידני" and show_bottom:
             fh = st.number_input(f"גובה תחתון מסגרת {i+1}", key=f"bottom_fh_{i}", min_value=10, value=60)
         frames_bottom.append((fw, fh))
 elif mode == "AI פריסטייל" and show_bottom:
-    default_fw = 80
-    default_fh = 60
+    default_fw, default_fh = 80, 60
     frames_bottom = [(default_fw, default_fh)] * len(frames_top)
 
 available_width = wall_width - 2 * side_margin
@@ -89,13 +79,13 @@ if st.button("📐 שרטט וחשב"):
     ax.set_aspect('equal')
     ax.invert_yaxis()
 
+    for x in [0, wall_width]:
+        ax.plot([x, x], [0, wall_height], color='gray')
     ax.plot([0, wall_width], [0, 0], color='gray')
     ax.plot([0, wall_width], [wall_height, wall_height], color='gray')
-    ax.plot([0, 0], [0, wall_height], color='gray')
-    ax.plot([wall_width, wall_width], [0, wall_height], color='gray')
 
-    current_x = side_margin
-    total_perimeter = 0
+    current_x, total_perimeter = side_margin, 0
+    frame_details = []
 
     for i, (fw, fh) in enumerate(frames_top):
         y = top_margin
@@ -104,7 +94,9 @@ if st.button("📐 שרטט וחשב"):
         ax.annotate(f"ס״מ {fh}", xy=(current_x - 10, y + fh / 2), rotation=90, va='center', fontsize=8, color='blue')
         if i < len(frames_top) - 1:
             ax.annotate(f"ס״מ {int(spacing)}", xy=(current_x + fw + spacing / 2, y + fh / 2), ha='center', fontsize=8, color='green')
-        total_perimeter += 2 * (fw + fh)
+        perimeter = 2 * (fw + fh)
+        total_perimeter += perimeter
+        frame_details.append(("עליון", i + 1, fw, fh, perimeter))
         current_x += fw + spacing
 
     if show_bottom:
@@ -114,7 +106,9 @@ if st.button("📐 שרטט וחשב"):
             ax.add_patch(plt.Rectangle((current_x, y), fw, fh, edgecolor='purple', facecolor='none', linewidth=2))
             ax.annotate(f"ס״מ {fw}", xy=(current_x + fw / 2, y + fh + 5), ha='center', fontsize=8, color='purple')
             ax.annotate(f"ס״מ {fh}", xy=(current_x - 10, y + fh / 2), rotation=90, va='center', fontsize=8, color='purple')
-            total_perimeter += 2 * (fw + fh)
+            perimeter = 2 * (fw + fh)
+            total_perimeter += perimeter
+            frame_details.append(("תחתון", i + 1, fw, fh, perimeter))
             current_x += fw + spacing
 
     st.pyplot(fig)
@@ -124,11 +118,14 @@ if st.button("📐 שרטט וחשב"):
     fig.savefig(buffer, format='png')
     buffer.seek(0)
 
-    text = f"תכנון קרניזים אישי - Welcome Design\nסה\"כ היקף קרניז: {total_perimeter} ס\"מ"
+    mot_length = 240 if "2 ס" in kind else 200
+    motim = math.ceil(total_perimeter / mot_length)
+    total_price = motim * price
+
+    text = f"תכנון קרניזים אישי - Welcome Design\nסה\"כ היקף: {total_perimeter} ס\"מ\nסה\"כ מוטות: {motim}\nסה\"כ מחיר: ₪{total_price}"
     whatsapp_url = f"https://wa.me/?text={urllib.parse.quote(text)}"
     st.markdown(f"[📤 שתף בוואטסאפ]({whatsapp_url})", unsafe_allow_html=True)
 
-    # יצירת PDF
     pdf_buffer = BytesIO()
     c = canvas.Canvas(pdf_buffer, pagesize=A4)
     c.setFont("David", 14)
@@ -143,6 +140,23 @@ if st.button("📐 שרטט וחשב"):
     reshaped_result = arabic_reshaper.reshape(f"סה\"כ היקף קרניז: {total_perimeter} ס\"מ")
     bidi_result = get_display(reshaped_result)
     c.drawRightString(550, 740, bidi_result)
+
+    y_position = 720
+    for pos, num, fw, fh, perim in frame_details:
+        line = f"מסגרת {pos} #{num}: {fw}×{fh} ס״מ | היקף: {perim} ס״מ"
+        reshaped_line = arabic_reshaper.reshape(line)
+        bidi_line = get_display(reshaped_line)
+        c.drawRightString(550, y_position, bidi_line)
+        y_position -= 20
+
+    summary_text = f"סה\"כ קרניזים: {total_perimeter} ס\"מ | נדרש {motim} מוטות ({mot_length} ס\"מ כל אחד)"
+    price_text = f"סה\"כ מחיר: ₪{total_price}"
+
+    for line in [summary_text, price_text]:
+        reshaped = arabic_reshaper.reshape(line)
+        bidi_line = get_display(reshaped)
+        c.drawRightString(550, y_position, bidi_line)
+        y_position -= 20
 
     c.drawImage(ImageReader(buffer), 50, 300, width=500, preserveAspectRatio=True, mask='auto')
     c.showPage()
