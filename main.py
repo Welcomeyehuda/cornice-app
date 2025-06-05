@@ -145,15 +145,17 @@ if st.button("📐 שרטט וחשב"):
     total_price = units * price
 
     summary_lines = [
-        f"📐 תכנון קרניזים מותאם אישית מבית Welcome Design:",
-        f"✨ דגם שנבחר: {kind}",
-        f"🧱 קיר: {wall_width}×{wall_height} ס\"מ",
-        "\n🔹 מסגרות:"]
+        f"🎨 תכנון אישי לחיפוי קרניזים מבית Welcome Design!",
+        f"\n🧱 מידות הקיר:\n• רוחב: {wall_width} ס\"מ\n• גובה: {wall_height} ס\"מ",
+        f"\n📦 דגם נבחר: קרניז {kind.split(' ')[0]} – {price}₪",
+        f"\n🖼️ מסגרות:"]
     for level, idx, fw, fh, perim in frame_details:
         summary_lines.append(f"{idx}. {level} – רוחב: {fw} ס\"מ | גובה: {fh} ס\"מ | היקף: {int(perim)} ס\"מ")
-    summary_lines.append(f"\n🧮 סה\"כ היקף: {int(total_perimeter)} ס\"מ")
-    summary_lines.append(f"🪵 נדרש: {units} יחידות (מוטות באורך {bar_length} ס\"מ)")
-    summary_lines.append(f"\n💰 מחיר כולל: {total_price} ₪")
+
+    summary_lines.append(f"\n🧮 סה\"כ היקף קרניזים: {int(total_perimeter)} ס\"מ")
+    summary_lines.append(f"🪵 נדרשים: {units} מוטות (באורך {bar_length} ס\"מ)")
+    summary_lines.append(f"\n💰 מחיר משוער: {total_price} ₪")
+    summary_lines.append(f"\n📞 מחירים מיוחדים והתקנה מקצועית – דברו איתנו!")
 
     summary_text = "\n".join(summary_lines)
     st.text_area("📋 פירוט הדו\"ח:", summary_text, height=250)
