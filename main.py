@@ -14,7 +14,16 @@ import urllib.parse
 pdfmetrics.registerFont(TTFont('David', 'DavidLibre-Medium.ttf'))
 
 st.set_page_config(page_title='דו"ח חיתוך קרניזים אישי - Welcome Design', layout="centered")
-st.image("לוגו חדש.png", width=300)
+
+# קריאה בטוחה ללוגו כקובץ בינארי
+try:
+    with open("לוגו חדש.png", "rb") as logo_file:
+        logo_bytes = logo_file.read()
+        st.image(logo_bytes, width=300)
+except Exception as e:
+    st.warning("⚠️ לא ניתן להציג את הלוגו. ודא שהקובץ 'לוגו חדש.png' קיים בתיקייה.")
+    logo_bytes = None
+
 st.title("✂️ תכנון חיתוך קרניזים אישי ומדויק")
 st.caption("חישוב כמויות אוטומטי מבית Welcome Design")
 
@@ -100,7 +109,9 @@ if st.button("📐 שרטט וחשב"):
 
         buffer = BytesIO()
         c = canvas.Canvas(buffer, pagesize=A4)
-        c.drawImage("לוגו חדש.png", 420, 770, width=130, preserveAspectRatio=True)
+        if logo_bytes:
+            logo_reader = ImageReader(BytesIO(logo_bytes))
+            c.drawImage(logo_reader, 420, 770, width=130, preserveAspectRatio=True)
         c.setFont('David', 14)
         c.drawCentredString(300, 790, rtl('דו"ח תכנון קרניזים בהתאמה אישית'))
         c.setFont('David', 12)
