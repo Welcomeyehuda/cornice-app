@@ -13,7 +13,7 @@ from bidi.algorithm import get_display
 # רישום הגופן העברי ל־PDF
 pdfmetrics.registerFont(TTFont('David', 'DavidLibre-Medium.ttf'))
 
-st.set_page_config(page_title="דו"ח חיתוך קרניזים אישי - Welcome Design", layout="centered")
+st.set_page_config(page_title='דו"ח חיתוך קרניזים אישי - Welcome Design', layout="centered")
 st.image("לוגו חדש.png", width=300)
 st.title("✂️ דו"ח חיתוך קרניזים אישי")
 st.caption("מיועד ללקוח כחלק מתהליך תכנון - Welcome Design")
