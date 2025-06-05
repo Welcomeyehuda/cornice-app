@@ -30,7 +30,7 @@ st.caption("חישוב כמויות אוטומטי מבית Welcome Design")
 mode = st.radio("בחר מצב תכנון:", ["AI פריסטייל", "תכנון ידני"], index=1)
 kind = st.radio("בחר סוג קרניז:", ["2 ס״מ - 69₪", "4 ס״מ - 100₪"], index=0)
 price = 69 if "2 ס״מ" in kind else 100
-bar_length = 290  # כל מוט קרניז הוא 2.9 מטר
+bar_length = 290
 
 wall_width = st.number_input("רוחב הקיר (בס״מ)", min_value=50, value=300, step=10)
 wall_height = st.number_input("גובה הקיר (בס״מ)", min_value=50, value=260, step=10)
@@ -40,6 +40,21 @@ frames_top, frames_bottom = [], []
 
 bottom_margin, vertical_gap, side_margin = 10, 20, 10
 top_margin, inter_row_gap = 20, 15
+
+def generate_pdf(summary_text):
+    buffer = BytesIO()
+    c = canvas.Canvas(buffer, pagesize=A4)
+    c.setFont("David", 12)
+    reshaped = arabic_reshaper.reshape(summary_text)
+    bidi_text = get_display(reshaped)
+    y = 800
+    for line in bidi_text.split("\n"):
+        c.drawRightString(550, y, get_display(arabic_reshaper.reshape(line)))
+        y -= 20
+    c.showPage()
+    c.save()
+    buffer.seek(0)
+    return buffer
 
 if mode == "תכנון ידני":
     st.subheader("✏️ מידות המסגרות העליונות")
@@ -133,7 +148,13 @@ if st.button("📐 שרטט וחשב"):
 
     col1, col2 = st.columns(2)
     with col1:
-        st.download_button("📄 הורד PDF", data=summary_text, file_name="cornice_summary.pdf")
+        pdf_buffer = generate_pdf(summary_text)
+        st.download_button(
+            label="📄 הורד PDF",
+            data=pdf_buffer,
+            file_name="cornice_summary.pdf",
+            mime="application/pdf"
+        )
     with col2:
         link = f"https://wa.me/?text={urllib.parse.quote(summary_text)}"
         st.markdown(f"[📤 שתף בוואטסאפ]({link})")
