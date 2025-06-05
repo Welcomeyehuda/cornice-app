@@ -9,6 +9,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.utils import ImageReader
 import arabic_reshaper
 from bidi.algorithm import get_display
+import urllib.parse
 
 pdfmetrics.registerFont(TTFont('David', 'DavidLibre-Medium.ttf'))
 
@@ -133,5 +134,6 @@ if st.button("📐 שרטט וחשב"):
     st.download_button("📄 הורד PDF", data=pdf_buffer, file_name="cornice_summary.pdf", mime="application/pdf")
 
     share_text = f"תכנון אישי לחיפוי קרניזים מבית Welcome Design! 🎨\n• היקף כולל: {total_perimeter} ס\"מ\n• נדרשים {required_sections} מוטות (2.90 מטר)\n• עלות משוערת: ₪{total_cost}\n📍מחירים מיוחדים והתקנה מקצועית – דברו איתנו!"
-    whatsapp_link = f"https://api.whatsapp.com/send?text={share_text}"
+    encoded = urllib.parse.quote(share_text)
+    whatsapp_link = f"https://api.whatsapp.com/send?text={encoded}"
     st.markdown(f"[📤 שתף בוואטסאפ]({whatsapp_link})")
