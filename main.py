@@ -45,6 +45,7 @@ bottom_margin = 10
 vertical_gap = 20
 side_margin = 10
 top_margin = 20
+inter_row_gap = 15  # קבוע בין 10 ל-15 ס״מ
 
 if mode == "תכנון ידני":
     st.subheader("✏️ מידות המסגרות העליונות")
@@ -109,22 +110,43 @@ if st.button("📐 שרטט וחשב"):
     if show_bottom:
         current_x = side_margin
         for i, (fw, fh) in enumerate(frames_bottom):
-            y = wall_height - fh - bottom_margin
+            y = top_margin + frames_top[i][1] + inter_row_gap
             ax.add_patch(plt.Rectangle((current_x, y), fw, fh, edgecolor='purple', facecolor='none', linewidth=2))
-            ax.annotate(f"ס״מ {fw}", xy=(current_x + fw / 2, y - 10), ha='center', fontsize=8, color='purple')
+            ax.annotate(f"ס״מ {fw}", xy=(current_x + fw / 2, y + fh + 5), ha='center', fontsize=8, color='purple')
             ax.annotate(f"ס״מ {fh}", xy=(current_x - 10, y + fh / 2), rotation=90, va='center', fontsize=8, color='purple')
             total_perimeter += 2 * (fw + fh)
             current_x += fw + spacing
 
     st.pyplot(fig)
-    st.success(f"היקף כולל: {total_perimeter} ס\"מ")
+    st.success(f"סה\"כ היקף קרניז: {total_perimeter} ס\"מ")
 
     buffer = BytesIO()
     fig.savefig(buffer, format='png')
     buffer.seek(0)
 
-    text = f"תכנון קרניזים אישי - Welcome Design\nהיקף כולל: {total_perimeter} ס\"מ"
+    text = f"תכנון קרניזים אישי - Welcome Design\nסה\"כ היקף קרניז: {total_perimeter} ס\"מ"
     whatsapp_url = f"https://wa.me/?text={urllib.parse.quote(text)}"
     st.markdown(f"[📤 שתף בוואטסאפ]({whatsapp_url})", unsafe_allow_html=True)
 
-    # future: add export to PDF with reportlab here if needed
+    # יצירת PDF
+    pdf_buffer = BytesIO()
+    c = canvas.Canvas(pdf_buffer, pagesize=A4)
+    c.setFont("David", 14)
+
+    if logo_bytes:
+        c.drawImage(ImageReader(BytesIO(logo_bytes)), 40, 770, width=100, height=40)
+
+    reshaped_title = arabic_reshaper.reshape("דו\"ח חיתוך קרניזים אישי")
+    bidi_title = get_display(reshaped_title)
+    c.drawCentredString(300, 780, bidi_title)
+
+    reshaped_result = arabic_reshaper.reshape(f"סה\"כ היקף קרניז: {total_perimeter} ס\"מ")
+    bidi_result = get_display(reshaped_result)
+    c.drawRightString(550, 740, bidi_result)
+
+    c.drawImage(ImageReader(buffer), 50, 300, width=500, preserveAspectRatio=True, mask='auto')
+    c.showPage()
+    c.save()
+    pdf_buffer.seek(0)
+
+    st.download_button(label="📥 הורד PDF הסיכום", data=pdf_buffer, file_name="cornice_summary.pdf", mime="application/pdf")
