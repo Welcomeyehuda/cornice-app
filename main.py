@@ -85,26 +85,29 @@ if st.button("📐 שרטט וחשב"):
     st.write(f"🪚 נדרש: {required_sections} מקטעי קרניז (כל מקטע באורך 2.90 מ׳)")
 
     def create_pdf():
+        def rtl(text):
+            return text[::-1]
+
         buffer = BytesIO()
         c = canvas.Canvas(buffer, pagesize=A4)
         c.setFont('David', 14)
         x_right = 500
         y = 800
 
-        c.drawRightString(x_right, y, "דו\"ח תכנון קרניזים")
+        c.drawRightString(x_right, y, rtl("דו\"ח תכנון קרניזים"))
         y -= 25
-        c.drawRightString(x_right, y, f"רוחב קיר: {wall_width} ס\"מ    גובה קיר: {wall_height} ס\"מ")
+        c.drawRightString(x_right, y, rtl(f"רוחב קיר: {wall_width} ס\"מ    גובה קיר: {wall_height} ס\"מ"))
         y -= 30
 
         for idx, (fw, fh) in enumerate(frames):
             perim = 2 * (fw + fh)
-            c.drawRightString(x_right, y, f"מסגרת {idx+1}: רוחב {fw} ס\"מ, גובה {fh} ס\"מ, היקף כולל {perim} ס\"מ")
+            c.drawRightString(x_right, y, rtl(f"מסגרת {idx+1}: רוחב {fw} ס\"מ, גובה {fh} ס\"מ, היקף כולל {perim} ס\"מ"))
             y -= 22
 
         y -= 10
-        c.drawRightString(x_right, y, f"סה\"כ היקף: {total_perimeter} ס\"מ")
+        c.drawRightString(x_right, y, rtl(f"סה\"כ היקף: {total_perimeter} ס\"מ"))
         y -= 20
-        c.drawRightString(x_right, y, f"סה\"כ מקטעי קרניז נדרשים: {required_sections} (באורך 2.90 מטר)")
+        c.drawRightString(x_right, y, rtl(f"סה\"כ מקטעי קרניז נדרשים: {required_sections} (באורך 2.90 מטר)"))
 
         c.showPage()
         c.save()
