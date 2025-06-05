@@ -51,7 +51,12 @@ top_margin = 20
 bottom_margin = 10
 available_width = wall_width - 2 * side_margin
 total_frames_width = sum(f[0] for f in frames)
-spacing = (available_width - total_frames_width) / (len(frames) + 1)
+
+# חישוב חדש של המרווח כך שיתפזר בין המסגרות
+if len(frames) > 1:
+    spacing = (available_width - total_frames_width) / (len(frames) - 1)
+else:
+    spacing = (available_width - total_frames_width) / 2
 
 if st.button("📐 שרטט וחשב"):
     fig, ax = plt.subplots(figsize=(10, 6))
@@ -65,7 +70,7 @@ if st.button("📐 שרטט וחשב"):
     ax.plot([0, 0], [0, wall_height], color='gray')
     ax.plot([wall_width, wall_width], [0, wall_height], color='gray')
 
-    current_x = side_margin + spacing
+    current_x = side_margin
     total_perimeter = 0
 
     for i, (fw, fh) in enumerate(frames):
