@@ -32,24 +32,16 @@ price = 69 if "2 ס״מ" in kind else 100
 wall_width = st.number_input("רוחב הקיר (בס״מ)", min_value=50, value=300, step=10)
 wall_height = st.number_input("גובה הקיר (בס״מ)", min_value=50, value=260, step=10)
 
-use_ai = st.checkbox("🪄 תכנן אוטומטית (פריסטייל)")
+frame_count = st.number_input("כמה מסגרות תרצה?", min_value=1, value=3, step=1)
+
+preset_mode = st.checkbox("🎨 פריסטייל אוטומטי")
 frames = []
 
-if use_ai:
-    side_margin = 10
-    top_margin = 20
-    bottom_margin = 10
-    max_frame_width = 120
-    spacing = 20
-    available_width = wall_width - 2 * side_margin
-    frame_width = 80
-    frame_height = 140
-    max_possible_frames = int((available_width + spacing) / (frame_width + spacing))
-    frame_count = max(1, min(max_possible_frames, 4))
-    for _ in range(frame_count):
-        frames.append((frame_width, frame_height))
+if preset_mode:
+    avg_width = (wall_width - 20) / frame_count - 10 if frame_count > 1 else (wall_width - 20)
+    avg_height = wall_height * 0.6
+    frames = [(round(avg_width), round(avg_height)) for _ in range(int(frame_count))]
 else:
-    frame_count = st.number_input("כמה מסגרות תרצה?", min_value=1, value=3, step=1)
     st.subheader("מידות כל מסגרת (בס״מ)")
     for i in range(int(frame_count)):
         col1, col2 = st.columns(2)
@@ -64,11 +56,7 @@ top_margin = 20
 bottom_margin = 10
 available_width = wall_width - 2 * side_margin
 total_frames_width = sum(f[0] for f in frames)
-
-if len(frames) > 1:
-    spacing = (available_width - total_frames_width) / (len(frames) - 1)
-else:
-    spacing = (available_width - total_frames_width) / 2
+spacing = (available_width - total_frames_width) / (len(frames) - 1) if len(frames) > 1 else (available_width - total_frames_width) / 2
 
 if st.button("📐 שרטט וחשב"):
     fig, ax = plt.subplots(figsize=(10, 6))
@@ -116,3 +104,68 @@ if st.button("📐 שרטט וחשב"):
 
     st.markdown("---")
     st.caption("*השרטוט לצורכי הדמיה בלבד – יש לוודא מדידות בשטח.*")
+
+    def rtl(text):
+        reshaped = arabic_reshaper.reshape(text)
+        return get_display(reshaped)
+
+    def create_pdf(fig):
+        img_buffer = BytesIO()
+        fig.savefig(img_buffer, format='PNG')
+        img_buffer.seek(0)
+
+        buffer = BytesIO()
+        c = canvas.Canvas(buffer, pagesize=A4)
+        if logo_bytes:
+            logo_reader = ImageReader(BytesIO(logo_bytes))
+            c.drawImage(logo_reader, 420, 770, width=130, preserveAspectRatio=True)
+        c.setFont('David', 14)
+        c.drawCentredString(300, 790, rtl('דו"ח תכנון קרניזים בהתאמה אישית'))
+        c.setFont('David', 12)
+
+        y = 750
+        c.drawRightString(550, y, rtl(f'רוחב קיר: {wall_width} ס"מ    גובה קיר: {wall_height} ס"מ'))
+        y -= 20
+
+        for idx, (fw, fh) in enumerate(frames):
+            perim = 2 * (fw + fh)
+            c.drawRightString(550, y, rtl(f'מסגרת {idx+1}: רוחב {fw} ס"מ, גובה {fh} ס"מ, היקף כולל {perim} ס"מ'))
+            y -= 18
+
+        y -= 10
+        c.drawRightString(550, y, rtl(f'סך הכול היקף: {total_perimeter} ס"מ'))
+        y -= 18
+        c.drawRightString(550, y, rtl(f'סך הכול נדרש: {required_sections} מוטות קרניז (2.90 מטר)'))
+        y -= 18
+        c.drawRightString(550, y, rtl(f'עלות משוערת: ₪{total_cost}'))
+
+        image = ImageReader(img_buffer)
+        c.drawImage(image, 50, 100, width=500, preserveAspectRatio=True)
+
+        c.rect(30, 30, 530, 780)
+        c.showPage()
+        c.save()
+        buffer.seek(0)
+        return buffer
+
+    pdf_buffer = create_pdf(fig)
+    st.download_button("📄 הורד PDF", data=pdf_buffer, file_name="cornice_summary.pdf", mime="application/pdf")
+
+    share_text = f"תכנון אישי לחיפוי קרניזים מבית Welcome Design! 🎨\n• היקף כולל: {total_perimeter} ס\"מ\n• נדרשים {required_sections} מוטות (2.90 מטר)\n• עלות משוערת: ₪{total_cost}\n📍מחירים מיוחדים והתקנה מקצועית – דברו איתנו!"
+    encoded = urllib.parse.quote(share_text)
+    whatsapp_link = f"https://api.whatsapp.com/send?text={encoded}"
+
+    png_buffer = BytesIO()
+    fig.savefig(png_buffer, format="PNG")
+    png_buffer.seek(0)
+
+    with st.expander("📤 שיתוף בוואטסאפ"):
+        st.download_button(
+            label="📷 הורד את השרטוט כתמונה (PNG)",
+            data=png_buffer,
+            file_name="cornice_diagram.png",
+            mime="image/png"
+        )
+        st.markdown("שלב 1️⃣: שלח את התמונה 👆 בוואטסאפ\n\nשלב 2️⃣: העתק את הטקסט והדבק 👇")
+        st.code(share_text, language="text")
+        st.markdown(f"[לחץ כאן לשלוח רק את הטקסט בוואטסאפ]({whatsapp_link})")
