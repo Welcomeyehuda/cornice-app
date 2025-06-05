@@ -10,22 +10,18 @@ from reportlab.lib.utils import ImageReader
 import arabic_reshaper
 from bidi.algorithm import get_display
 
-# רישום הגופן העברי ל־PDF
 pdfmetrics.registerFont(TTFont('David', 'DavidLibre-Medium.ttf'))
 
 st.set_page_config(page_title='דו"ח חיתוך קרניזים אישי - Welcome Design', layout="centered")
 st.image("לוגו חדש.png", width=300)
-st.title("✂️ דו"ח חיתוך קרניזים אישי")
-st.caption("מיועד ללקוח כחלק מתהליך תכנון - Welcome Design")
+st.title("✂️ תכנון חיתוך קרניזים אישי ומדויק")
+st.caption("חישוב כמויות אוטומטי מבית Welcome Design")
 
-# קלט מידות קיר
 wall_width = st.number_input("רוחב הקיר (בס״מ)", min_value=50, value=300, step=10)
 wall_height = st.number_input("גובה הקיר (בס״מ)", min_value=50, value=260, step=10)
 
-# מספר מסגרות
 frame_count = st.number_input("כמה מסגרות תרצה?", min_value=1, value=3, step=1)
 
-# קלט מסגרות
 frames = []
 st.subheader("מידות כל מסגרת (בס״מ)")
 for i in range(int(frame_count)):
@@ -36,7 +32,6 @@ for i in range(int(frame_count)):
         fh = st.number_input(f"גובה מסגרת {i+1}", key=f"fh_{i}", min_value=10, value=140)
     frames.append((fw, fh))
 
-# מרווחים קבועים
 side_margin = 10
 top_margin = 20
 bottom_margin = 10
@@ -44,7 +39,6 @@ available_width = wall_width - 2 * side_margin
 total_frames_width = sum(f[0] for f in frames)
 spacing = (available_width - total_frames_width) / (len(frames) + 1)
 
-# כפתור פעולה
 if st.button("📐 שרטט וחשב"):
     fig, ax = plt.subplots(figsize=(10, 6))
     ax.set_xlim(0, wall_width)
@@ -84,7 +78,7 @@ if st.button("📐 שרטט וחשב"):
 
     section_length_cm = 290
     required_sections = math.ceil(total_perimeter / section_length_cm)
-    st.write(f"🪚 נדרש: {required_sections} יחידות קרניז (2.90 מטר)")
+    st.write(f"🪚 נדרש: {required_sections} מוטות קרניז (2.90 מטר)")
 
     kind = st.radio("בחר סוג קרניז:", ["2 ס״מ - 69₪", "4 ס״מ - 100₪"], index=0)
     price = 69 if "2 ס״מ" in kind else 100
@@ -122,7 +116,7 @@ if st.button("📐 שרטט וחשב"):
         y -= 10
         c.drawRightString(550, y, rtl(f'סך הכול היקף: {total_perimeter} ס"מ'))
         y -= 18
-        c.drawRightString(550, y, rtl(f'סך הכול נדרש: {required_sections} יחידות קרניז (2.90 מטר)'))
+        c.drawRightString(550, y, rtl(f'סך הכול נדרש: {required_sections} מוטות קרניז (2.90 מטר)'))
         y -= 18
         c.drawRightString(550, y, rtl(f'עלות משוערת: ₪{total_cost}'))
 
@@ -138,6 +132,6 @@ if st.button("📐 שרטט וחשב"):
     pdf_buffer = create_pdf(fig)
     st.download_button("📄 הורד PDF", data=pdf_buffer, file_name="cornice_summary.pdf", mime="application/pdf")
 
-    share_text = f"תכנון מותאם אישית לקרניזים של Welcome Design\nהיקף כולל: {total_perimeter} ס\"מ\nנדרשות {required_sections} יחידות.\nעלות משוערת: ₪{total_cost}"
+    share_text = f"תכנון אישי לחיפוי קרניזים מבית Welcome Design! 🎨\n• היקף כולל: {total_perimeter} ס\"מ\n• נדרשים {required_sections} מוטות (2.90 מטר)\n• עלות משוערת: ₪{total_cost}\n📍מחירים מיוחדים והתקנה מקצועית – דברו איתנו!"
     whatsapp_link = f"https://api.whatsapp.com/send?text={share_text}"
     st.markdown(f"[📤 שתף בוואטסאפ]({whatsapp_link})")
