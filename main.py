@@ -149,6 +149,10 @@ if st.button("📐 שרטט וחשב"):
         bidi_line = get_display(reshaped_line)
         c.drawRightString(550, y_position, bidi_line)
         y_position -= 20
+        if y_position < 300:
+            c.showPage()
+            c.setFont("David", 14)
+            y_position = 770
 
     summary_text = f"סה\"כ קרניזים: {total_perimeter} ס\"מ | נדרש {motim} מוטות ({mot_length} ס\"מ כל אחד)"
     price_text = f"סה\"כ מחיר: ₪{total_price}"
@@ -159,7 +163,7 @@ if st.button("📐 שרטט וחשב"):
         c.drawRightString(550, y_position, bidi_line)
         y_position -= 20
 
-    c.drawImage(ImageReader(buffer), 50, 300, width=500, preserveAspectRatio=True, mask='auto')
+    c.drawImage(ImageReader(buffer), 50, 20, width=500, preserveAspectRatio=True, mask='auto')
     c.showPage()
     c.save()
     pdf_buffer.seek(0)
