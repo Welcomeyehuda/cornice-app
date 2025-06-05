@@ -7,6 +7,8 @@ from reportlab.lib.pagesizes import A4
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.utils import ImageReader
+import arabic_reshaper
+from bidi.algorithm import get_display
 
 # רישום הגופן העברי ל־PDF
 pdfmetrics.registerFont(TTFont('David', 'DavidLibre-Medium.ttf'))
@@ -85,6 +87,10 @@ if st.button("📐 שרטט וחשב"):
     required_sections = math.ceil(total_perimeter / section_length_cm)
     st.write(f"🪚 נדרש: {required_sections} מקטעי קרניז (כל מקטע באורך 2.90 מ׳)")
 
+    def rtl(text):
+        reshaped = arabic_reshaper.reshape(text)
+        return get_display(reshaped)
+
     def create_pdf(fig):
         img_buffer = BytesIO()
         fig.savefig(img_buffer, format='PNG')
@@ -93,29 +99,29 @@ if st.button("📐 שרטט וחשב"):
         buffer = BytesIO()
         c = canvas.Canvas(buffer, pagesize=A4)
         c.setFont('David', 18)
-        c.drawCentredString(300, 810, "ברוכים הבאים ל־Welcome Design")
+        c.drawCentredString(300, 810, rtl("ברוכים הבאים ל־Welcome Design"))
         c.setFont('David', 14)
-        c.drawCentredString(300, 790, 'דו"ח תכנון קרניזים בהתאמה אישית')
+        c.drawCentredString(300, 790, rtl('דו"ח תכנון קרניזים בהתאמה אישית'))
         c.setFont('David', 12)
 
         y = 750
-        c.drawRightString(550, y, f'רוחב קיר: {wall_width} ס"מ    גובה קיר: {wall_height} ס"מ')
+        c.drawRightString(550, y, rtl(f'רוחב קיר: {wall_width} ס"מ    גובה קיר: {wall_height} ס"מ'))
         y -= 20
 
         for idx, (fw, fh) in enumerate(frames):
             perim = 2 * (fw + fh)
-            c.drawRightString(550, y, f'מסגרת {idx+1}: רוחב {fw} ס"מ, גובה {fh} ס"מ, היקף כולל {perim} ס"מ')
+            c.drawRightString(550, y, rtl(f'מסגרת {idx+1}: רוחב {fw} ס"מ, גובה {fh} ס"מ, היקף כולל {perim} ס"מ'))
             y -= 18
 
         y -= 10
-        c.drawRightString(550, y, f'סך הכול היקף: {total_perimeter} ס"מ')
+        c.drawRightString(550, y, rtl(f'סך הכול היקף: {total_perimeter} ס"מ'))
         y -= 18
-        c.drawRightString(550, y, f'סך הכול מקטעי קרניז נדרשים: {required_sections} (באורך 2.90 מטר)')
+        c.drawRightString(550, y, rtl(f'סך הכול מקטעי קרניז נדרשים: {required_sections} (באורך 2.90 מטר)'))
 
         image = ImageReader(img_buffer)
         c.drawImage(image, 50, 100, width=500, preserveAspectRatio=True)
 
-        c.rect(30, 30, 530, 780)  # מסגרת עיצובית
+        c.rect(30, 30, 530, 780)
         c.showPage()
         c.save()
         buffer.seek(0)
