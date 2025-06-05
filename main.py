@@ -104,4 +104,4 @@ if st.button("📐 שרטט וחשב"):
             current_x += fw + spacing
 
     st.pyplot(fig)
-    st.success(f"היקף כולל: {total_perimeter} ס"מ")
+    st.success(f"היקף כולל: {total_perimeter} ס\"מ")
