@@ -137,11 +137,7 @@ if st.button("📐 שרטט וחשב"):
     bidi_title = get_display(reshaped_title)
     c.drawCentredString(300, 780, bidi_title)
 
-    reshaped_result = arabic_reshaper.reshape(f"סה\"כ היקף קרניז: {total_perimeter} ס\"מ")
-    bidi_result = get_display(reshaped_result)
-    c.drawRightString(550, 740, bidi_result)
-
-    y_position = 720
+    y_position = 740
     for pos, num, fw, fh, perim in frame_details:
         line = f"מסגרת {pos} #{num}: {fw}×{fh} ס״מ | היקף: {perim} ס״מ"
         reshaped_line = arabic_reshaper.reshape(line)
