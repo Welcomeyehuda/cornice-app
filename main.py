@@ -46,17 +46,28 @@ def generate_pdf(summary_text, fig):
     c = canvas.Canvas(buffer, pagesize=A4)
     c.setFont("David", 12)
 
+    # מסגרת עיצוב לדף הראשון
+    c.setStrokeColorRGB(0.7, 0.7, 0.7)
+    c.rect(30, 100, 530, 720, stroke=1, fill=0)
+
     reshaped_lines = [get_display(arabic_reshaper.reshape(line)) for line in summary_text.split("\n")]
     y = 800
     for line in reshaped_lines:
         c.drawRightString(550, y, line)
         y -= 20
 
+    c.showPage()
+
+    # דף השרטוט
+    c.setFont("David", 16)
+    title = get_display(arabic_reshaper.reshape("תוכנית קרניזים"))
+    c.drawRightString(550, 800, title)
+
     img_buffer = BytesIO()
     fig.savefig(img_buffer, format='png', bbox_inches='tight')
     img_buffer.seek(0)
     img = ImageReader(img_buffer)
-    c.drawImage(img, 100, 100, width=400, preserveAspectRatio=True)
+    c.drawImage(img, 100, 250, width=400, preserveAspectRatio=True)
 
     c.showPage()
     c.save()
