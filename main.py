@@ -84,7 +84,11 @@ if st.button("📐 שרטט וחשב"):
     required_sections = math.ceil(total_perimeter / section_length_cm)
     st.write(f"🪚 נדרש: {required_sections} מקטעי קרניז (כל מקטע באורך 2.90 מ׳)")
 
-    def create_pdf():
+    def create_pdf(fig):
+        img_buffer = BytesIO()
+        fig.savefig(img_buffer, format='PNG')
+        img_buffer.seek(0)
+
         buffer = BytesIO()
         c = canvas.Canvas(buffer, pagesize=A4)
         c.setFont('David', 14)
@@ -107,9 +111,12 @@ if st.button("📐 שרטט וחשב"):
         c.drawRightString(x_right, y, f"סה\"כ מקטעי קרניז נדרשים: {required_sections} (באורך 2.90 מטר)")
 
         c.showPage()
+        c.drawImage(img_buffer, 50, 200, width=500, preserveAspectRatio=True, mask='auto')
+
+        c.showPage()
         c.save()
         buffer.seek(0)
         return buffer
 
-    pdf_buffer = create_pdf()
+    pdf_buffer = create_pdf(fig)
     st.download_button("📄 הורד PDF עם הסיכום", data=pdf_buffer, file_name="cornice_summary.pdf", mime="application/pdf")
