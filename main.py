@@ -27,6 +27,10 @@ except Exception as e:
 st.title("✂️ תכנון חיתוך קרניזים אישי ומדויק")
 st.caption("חישוב כמויות אוטומטי מבית Welcome Design")
 
+# סוג הקרניז לפני השרטוט
+kind = st.radio("בחר סוג קרניז:", ["2 ס״מ - 69₪", "4 ס״מ - 100₪"], index=0)
+price = 69 if "2 ס״מ" in kind else 100
+
 wall_width = st.number_input("רוחב הקיר (בס״מ)", min_value=50, value=300, step=10)
 wall_height = st.number_input("גובה הקיר (בס״מ)", min_value=50, value=260, step=10)
 
@@ -90,8 +94,6 @@ if st.button("📐 שרטט וחשב"):
     required_sections = math.ceil(total_perimeter / section_length_cm)
     st.write(f"🪚 נדרש: {required_sections} מוטות קרניז (2.90 מטר)")
 
-    kind = st.radio("בחר סוג קרניז:", ["2 ס״מ - 69₪", "4 ס״מ - 100₪"], index=0)
-    price = 69 if "2 ס״מ" in kind else 100
     total_cost = required_sections * price
     st.write(f"💰 עלות משוערת: ₪{total_cost}")
 
