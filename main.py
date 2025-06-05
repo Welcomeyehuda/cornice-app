@@ -46,7 +46,6 @@ spacing = (available_width - total_frames_width) / (len(frames) + 1)
 
 # כפתור פעולה
 if st.button("📐 שרטט וחשב"):
-    # ציור
     fig, ax = plt.subplots(figsize=(10, 6))
     ax.set_xlim(0, wall_width)
     ax.set_ylim(0, wall_height)
@@ -77,23 +76,20 @@ if st.button("📐 שרטט וחשב"):
 
     st.pyplot(fig)
 
-    # סיכום טקסטואלי
     st.subheader("📋 סיכום כמויות:")
     for idx, (fw, fh) in enumerate(frames):
         perim = 2 * (fw + fh)
         st.write(f"🔹 מסגרת {idx+1}: היקף ס״מ {perim}")
-    st.write(f"🧮 סך הכול היקף: ס״מ {total_perimeter}")
+    st.write(f"📏 סך הכול היקף: {total_perimeter} ס״מ")
 
     section_length_cm = 290
     required_sections = math.ceil(total_perimeter / section_length_cm)
-    st.write(f"🪚 נדרש: {required_sections} יחידות קרניז (באורך 2.90 מטר)")
+    st.write(f"🪚 נדרש: {required_sections} יחידות קרניז (2.90 מטר)")
 
-    if required_sections:
-        if st.radio("בחר סוג קרניז:", ["2 ס״מ - 69₪", "4 ס״מ - 100₪"], index=0) == "2 ס״מ - 69₪":
-            price = 69
-        else:
-            price = 100
-        st.write(f"💰 עלות משוערת: ₪{required_sections * price}")
+    kind = st.radio("בחר סוג קרניז:", ["2 ס״מ - 69₪", "4 ס״מ - 100₪"], index=0)
+    price = 69 if "2 ס״מ" in kind else 100
+    total_cost = required_sections * price
+    st.write(f"💰 עלות משוערת: ₪{total_cost}")
 
     st.markdown("---")
     st.caption("*השרטוט לצורכי הדמיה בלבד – יש לוודא מדידות בשטח.*")
@@ -111,7 +107,7 @@ if st.button("📐 שרטט וחשב"):
         c = canvas.Canvas(buffer, pagesize=A4)
         c.drawImage("לוגו חדש.png", 420, 770, width=130, preserveAspectRatio=True)
         c.setFont('David', 14)
-        c.drawCentredString(300, 790, rtl('דו"ח חיתוך קרניזים אישי'))
+        c.drawCentredString(300, 790, rtl('דו"ח תכנון קרניזים בהתאמה אישית'))
         c.setFont('David', 12)
 
         y = 750
@@ -127,6 +123,8 @@ if st.button("📐 שרטט וחשב"):
         c.drawRightString(550, y, rtl(f'סך הכול היקף: {total_perimeter} ס"מ'))
         y -= 18
         c.drawRightString(550, y, rtl(f'סך הכול נדרש: {required_sections} יחידות קרניז (2.90 מטר)'))
+        y -= 18
+        c.drawRightString(550, y, rtl(f'עלות משוערת: ₪{total_cost}'))
 
         image = ImageReader(img_buffer)
         c.drawImage(image, 50, 100, width=500, preserveAspectRatio=True)
@@ -140,6 +138,6 @@ if st.button("📐 שרטט וחשב"):
     pdf_buffer = create_pdf(fig)
     st.download_button("📄 הורד PDF", data=pdf_buffer, file_name="cornice_summary.pdf", mime="application/pdf")
 
-    share_text = f"תכנון מותאם אישית לקרניזים של Welcome Design\nהיקף כולל: {total_perimeter} ס\"מ\nנדרשות {required_sections} יחידות."
+    share_text = f"תכנון מותאם אישית לקרניזים של Welcome Design\nהיקף כולל: {total_perimeter} ס\"מ\nנדרשות {required_sections} יחידות.\nעלות משוערת: ₪{total_cost}"
     whatsapp_link = f"https://api.whatsapp.com/send?text={share_text}"
     st.markdown(f"[📤 שתף בוואטסאפ]({whatsapp_link})")
