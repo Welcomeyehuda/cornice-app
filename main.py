@@ -110,7 +110,7 @@ if st.button("📐 שרטט וחשב"):
             ax.add_patch(plt.Rectangle((current_x, y), fw, fh, edgecolor='purple', facecolor='none', linewidth=2))
             ax.annotate(f"ס״מ {fw}", xy=(current_x + fw / 2, y + fh + 5), ha='center', fontsize=8, color='purple')
             ax.annotate(f"ס״מ {fh}", xy=(current_x - 10, y + fh / 2), rotation=90, va='center', fontsize=8, color='purple')
-            ax.annotate(f"רווח 15 ס\"מ", xy=(current_x + fw / 2, y - inter_row_gap / 2), ha='center', fontsize=8, color='gray')
+            ax.annotate(f"רווח 15 ס""מ", xy=(current_x + fw / 2, y - inter_row_gap / 2), ha='center', fontsize=8, color='gray')
             perimeter = 2 * (fw + fh)
             total_perimeter += perimeter
             frame_details.append(("תחתון", i + 1, fw, fh, perimeter))
@@ -119,23 +119,21 @@ if st.button("📐 שרטט וחשב"):
     st.pyplot(fig)
     st.success(f"סה\"כ היקף קרניז: {total_perimeter} ס\"מ")
 
-    summary_lines = ["סיכום כמויות:"]
+    units = math.ceil(total_perimeter / bar_length)
+    total_price = units * price
+
+    summary_lines = [f"✨ דגם קרניז שנבחר: {kind}", "\nסיכום כמויות:"]
     for level, idx, fw, fh, perim in frame_details:
         summary_lines.append(f"🔹 מסגרת {idx} ({level}): היקף {perim} ס\"מ | רוחב {fw} ס\"מ | גובה {fh} ס\"מ")
-    summary_lines.append(f"\n🧮 סה\"כ היקף: {int(total_perimeter)} ס\"מ | {math.ceil(total_perimeter / bar_length)} יחידות")
+    summary_lines.append(f"\n🧮 סה\"כ היקף: {int(total_perimeter)} ס\"מ | {units} יחידות")
+    summary_lines.append(f"💰 סה\"כ מחיר: {total_price} ש\"ח")
+
     summary_text = "\n".join(summary_lines)
-
-    st.text_area("📋 פירוט הדו\"ח:", summary_text, height=200)
-
-    img_buf = BytesIO()
-    fig.savefig(img_buf, format='png')
-    img_buf.seek(0)
-    img_base64 = base64.b64encode(img_buf.read()).decode('utf-8')
+    st.text_area("📋 פירוט הדו\"ח:", summary_text, height=250)
 
     col1, col2 = st.columns(2)
     with col1:
-        st.download_button("📄 הורד PDF (בשלב הבא)", data=summary_text, file_name="cornice_summary.txt")
+        st.download_button("📄 הורד PDF", data=summary_text, file_name="cornice_summary.pdf")
     with col2:
-        msg = summary_text + f"\n💰 סה\"כ מחיר: {math.ceil(total_perimeter/bar_length)*price} ש\"ח"
-        link = f"https://wa.me/?text={urllib.parse.quote(msg)}"
+        link = f"https://wa.me/?text={urllib.parse.quote(summary_text)}"
         st.markdown(f"[📤 שתף בוואטסאפ]({link})")
